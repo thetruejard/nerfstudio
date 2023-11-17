@@ -199,7 +199,7 @@ class ScanNetpp(DataParser):
             image_filenames=image_filenames,
             cameras=cameras,
             scene_box=scene_box,
-            mask_filenames=mask_filenames if len(mask_filenames) > 0 else None,
+            mask_filenames=None, #mask_filenames if len(mask_filenames) > 0 else None,
             dataparser_scale=scale_factor,
             dataparser_transform=transform_matrix,
             metadata={},
