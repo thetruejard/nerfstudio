@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import json
 from pathlib import Path
 from typing import Literal, Type
 
@@ -68,6 +69,8 @@ class ScanNetppDataParserConfig(DataParserConfig):
     """Relative path to the masks directory (default: resized_anon_masks)"""
     transforms_path: Path = Path("dslr/nerfstudio/transforms.json")
     """Relative path to the transforms.json file"""
+    masks_file: Path = Path('/')
+    """SNAIL: Path to the masks.json file created by get_masks.py. Used to determine whether the scene needs anonymized masks."""
 
 
 @dataclass
@@ -195,11 +198,25 @@ class ScanNetpp(DataParser):
             camera_type=camera_type,
         )
 
+
+        # === SNAIL ===
+        needs_mask = False
+        if self.config.masks_file != Path('/'):
+            with open(self.config.masks_file, 'r') as f:
+                masks = json.load(f)
+            scene_name = self.config.data.stem
+            needs_mask = masks[scene_name]['needs_mask']
+            print('SNAIL: This scene', 'needs' if needs_mask else 'does not need', 'anonymized masks')
+        else:
+            print('SNAIL: Masks file not specified, masks will not be used. Specify masks.json with --masks-file')
+        # =============
+
+
         dataparser_outputs = DataparserOutputs(
             image_filenames=image_filenames,
             cameras=cameras,
             scene_box=scene_box,
-            mask_filenames=None, #mask_filenames if len(mask_filenames) > 0 else None,
+            mask_filenames=(mask_filenames if (needs_mask and len(mask_filenames) > 0) else None),
             dataparser_scale=scale_factor,
             dataparser_transform=transform_matrix,
             metadata={},
