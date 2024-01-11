@@ -207,8 +207,6 @@ class ScanNetpp(DataParser):
             scene_name = self.config.data.stem
             needs_mask = masks[scene_name]['needs_mask']
             print('SNAIL: This scene', 'needs' if needs_mask else 'does not need', 'anonymized masks')
-        else:
-            print('SNAIL: Masks file not specified, masks will not be used. Specify masks.json with --masks-file')
         # =============
 
 
